@@ -14,7 +14,9 @@ export function formatCurrency(value: number): string {
 
 export function formatDate(date: string | null | undefined): string {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("pt-BR").format(new Date(date + "T00:00:00"));
+  // Date-only strings need T00:00:00 to parse as local time; timestamps already have it
+  const d = new Date(date.includes("T") ? date : date + "T00:00:00");
+  return new Intl.DateTimeFormat("pt-BR").format(d);
 }
 
 export function formatDateTime(date: string | null | undefined): string {
