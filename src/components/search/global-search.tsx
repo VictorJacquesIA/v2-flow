@@ -137,7 +137,7 @@ export function GlobalSearch() {
 
           {query.trim().length >= 2 && !loading && results.length === 0 && (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-              Nenhum resultado para <span className="font-medium text-foreground">"{query}"</span>
+              Nenhum resultado para <span className="font-medium text-foreground">&quot;{query}&quot;</span>
             </div>
           )}
 
