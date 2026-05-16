@@ -95,7 +95,7 @@ export default async function FinanceiroPage() {
                         <Badge variant={overdue ? "destructive" : sc.variant} className="text-xs">
                           {overdue ? "Atrasado" : sc.label}
                         </Badge>
-                        {charge.status === "pendente" && (
+                        {(charge.status === "pendente" || charge.status === "atrasado") && (
                           <MarkPaidButton chargeId={charge.id} />
                         )}
                         <ChargeDialog charge={charge as Parameters<typeof ChargeDialog>[0]["charge"]}>

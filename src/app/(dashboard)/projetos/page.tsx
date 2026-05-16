@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ProjectDialog } from "@/components/projects/project-dialog";
 import { Plus, Calendar, DollarSign, User } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import Link from "next/link";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "success" | "warning" | "info" | "destructive" | "purple" }> = {
   lead: { label: "Lead", variant: "secondary" },
@@ -63,7 +64,9 @@ export default async function ProjetosPage() {
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-semibold">{project.name}</p>
+                          <Link href={`/projetos/${project.id}`} className="font-semibold hover:underline">
+                            {project.name}
+                          </Link>
                           <Badge variant={sc.variant} className="text-xs">{sc.label}</Badge>
                           <Badge variant={pc.variant} className="text-xs">{pc.label}</Badge>
                         </div>

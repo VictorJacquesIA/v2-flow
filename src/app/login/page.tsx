@@ -1,16 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Zap, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import Image from "next/image";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const supabase = createClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,6 +19,7 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
@@ -29,24 +28,22 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/dashboard");
-    router.refresh();
+    window.location.href = "/dashboard";
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-8">
         {/* Logo */}
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary shadow-lg">
-            <Zap className="h-6 w-6 text-primary-foreground" />
-          </div>
-          <div className="text-center">
-            <h1 className="text-2xl font-bold tracking-tight">V2 Flow</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Gestão da sua agência digital
-            </p>
-          </div>
+        <div className="flex justify-center">
+          <Image
+            src="/logo.png"
+            alt="V2 Digital Flow"
+            width={220}
+            height={220}
+            className="object-contain"
+            priority
+          />
         </div>
 
         {/* Form */}
@@ -96,7 +93,7 @@ export default function LoginPage() {
         </form>
 
         <p className="text-center text-xs text-muted-foreground">
-          Acesso restrito à equipe V2 Agency
+          Acesso restrito à equipe V2 Digital
         </p>
       </div>
     </div>

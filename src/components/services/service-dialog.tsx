@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { createServiceAction, updateServiceAction } from "@/app/actions/services";
+import { createServiceAction, updateServiceAction, deleteServiceAction } from "@/app/actions/services";
 import type { Service } from "@/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ServiceDialogProps {
@@ -23,6 +23,7 @@ export function ServiceDialog({ children, service }: ServiceDialogProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [type, setType] = useState(service?.type ?? "unico");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -78,12 +79,40 @@ export function ServiceDialog({ children, service }: ServiceDialogProps) {
               </Select>
             </div>
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {service ? "Salvar" : "Criar Serviço"}
-            </Button>
+          <div className="flex items-center justify-between pt-2">
+            {service ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                disabled={deleting || loading}
+                onClick={async () => {
+                  if (!confirm(`Excluir "${service.name}"? Esta ação não pode ser desfeita.`)) return;
+                  setDeleting(true);
+                  try {
+                    await deleteServiceAction(service.id);
+                    toast({ title: "Serviço excluído" });
+                    setOpen(false);
+                    router.refresh();
+                  } catch {
+                    toast({ title: "Erro ao excluir serviço", variant: "destructive" });
+                  } finally {
+                    setDeleting(false);
+                  }
+                }}
+              >
+                {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                Excluir
+              </Button>
+            ) : <span />}
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+              <Button type="submit" disabled={loading || deleting}>
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {service ? "Salvar" : "Criar Serviço"}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>

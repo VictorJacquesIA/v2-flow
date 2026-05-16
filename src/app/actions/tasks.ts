@@ -43,6 +43,7 @@ export async function createTaskAction(formData: FormData) {
   if (error) throw error;
   revalidatePath("/tarefas");
   revalidatePath("/dashboard");
+  if (payload.client_id) revalidatePath(`/clientes/${payload.client_id}`);
 }
 
 export async function updateTaskAction(id: string, formData: FormData) {
@@ -62,6 +63,7 @@ export async function updateTaskAction(id: string, formData: FormData) {
   if (error) throw error;
   revalidatePath("/tarefas");
   revalidatePath("/dashboard");
+  if (payload.client_id) revalidatePath(`/clientes/${payload.client_id}`);
 }
 
 export async function updateTaskStatusAction(id: string, status: TaskStatus) {

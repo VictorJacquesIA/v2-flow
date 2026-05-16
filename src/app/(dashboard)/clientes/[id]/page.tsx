@@ -12,9 +12,10 @@ import { TaskDialog } from "@/components/tasks/task-dialog";
 import { LinkDialog } from "@/components/links/link-dialog";
 import { AccessDialog } from "@/components/accesses/access-dialog";
 import { ChargeDialog } from "@/components/charges/charge-dialog";
+import { RevealPasswordButton } from "@/components/accesses/reveal-password-button";
 import {
   Edit, Trash2, Plus, MessageCircle, Mail, Globe,
-  ExternalLink, Lock, Eye, Calendar, DollarSign
+  ExternalLink, Lock, Calendar, DollarSign
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import Link from "next/link";
@@ -307,11 +308,3 @@ export default async function ClientPage({ params }: { params: { id: string } })
   );
 }
 
-function RevealPasswordButton({ encryptedPassword }: { encryptedPassword: string }) {
-  "use client";
-  return (
-    <button className="text-muted-foreground hover:text-foreground transition-colors" title="Ver senha">
-      <Eye className="h-4 w-4" />
-    </button>
-  );
-}
