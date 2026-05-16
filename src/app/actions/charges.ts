@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { logActivity } from "./activity";
 import type { ChargeStatus, PaymentMethod } from "@/types";
 
 export async function getCharges() {
@@ -40,8 +41,9 @@ export async function createChargeAction(formData: FormData) {
     paid_at: formData.get("paid_at") as string || null,
   };
 
-  const { error } = await supabase.from("charges").insert([payload]);
+  const { data, error } = await supabase.from("charges").insert([payload]).select("id").single();
   if (error) throw error;
+  await logActivity({ entityType: "charge", entityId: data.id, entityName: payload.description, action: "created", clientId: payload.client_id, projectId: payload.project_id });
   revalidatePath("/financeiro");
   revalidatePath("/dashboard");
 }
@@ -70,11 +72,15 @@ export async function updateChargeAction(id: string, formData: FormData) {
 
 export async function markChargePaidAction(id: string) {
   const supabase = await createClient();
+  const { data: charge } = await supabase.from("charges").select("description, client_id, project_id").eq("id", id).single();
   const { error } = await supabase
     .from("charges")
     .update({ status: "pago", paid_at: new Date().toISOString() })
     .eq("id", id);
   if (error) throw error;
+  if (charge) {
+    await logActivity({ entityType: "charge", entityId: id, entityName: charge.description, action: "paid", clientId: charge.client_id, projectId: charge.project_id });
+  }
   revalidatePath("/financeiro");
   revalidatePath("/dashboard");
 }

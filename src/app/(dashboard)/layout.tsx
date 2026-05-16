@@ -1,4 +1,6 @@
 import { Sidebar } from "@/components/layout/sidebar";
+import { GlobalSearch } from "@/components/search/global-search";
+import { QuickActionsFab } from "@/components/common/quick-actions-fab";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -16,10 +18,12 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
+      <GlobalSearch />
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         {children}
       </main>
+      <QuickActionsFab />
     </div>
   );
 }

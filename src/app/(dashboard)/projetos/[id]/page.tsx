@@ -3,11 +3,13 @@ import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProjectDialog } from "@/components/projects/project-dialog";
 import { ProjectDocumentsCard } from "@/components/projects/project-documents-card";
+import { ActivityTimeline } from "@/components/common/activity-timeline";
 import { getProjectDocuments } from "@/app/actions/documents";
-import { Edit, Calendar, DollarSign, User, TrendingUp } from "lucide-react";
+import { getProjectActivity } from "@/app/actions/activity";
+import { Edit, Calendar, DollarSign, User, TrendingUp, Clock } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import Link from "next/link";
 
@@ -32,13 +34,14 @@ const priorityConfig: Record<string, { label: string; variant: "destructive" | "
 export default async function ProjetoPage({ params }: { params: { id: string } }) {
   const supabase = await createClient();
 
-  const [{ data: project }, documents] = await Promise.all([
+  const [{ data: project }, documents, activityLogs] = await Promise.all([
     supabase
       .from("projects")
       .select("*, clients(id, name, company)")
       .eq("id", params.id)
       .single(),
     getProjectDocuments(params.id),
+    getProjectActivity(params.id),
   ]);
 
   if (!project) notFound();
@@ -146,6 +149,19 @@ export default async function ProjetoPage({ params }: { params: { id: string } }
           projectId={project.id}
           documents={documents ?? []}
         />
+
+        {/* Atividade */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Atividade Recente</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ActivityTimeline logs={activityLogs} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { logActivity } from "./activity";
 import type { ClientStatus } from "@/types";
 
 export async function getClients() {
@@ -40,8 +41,9 @@ export async function createClientAction(formData: FormData) {
     notes: formData.get("notes") as string || null,
   };
 
-  const { error } = await supabase.from("clients").insert([payload]);
+  const { data, error } = await supabase.from("clients").insert([payload]).select("id").single();
   if (error) throw error;
+  await logActivity({ entityType: "client", entityId: data.id, entityName: payload.name, action: "created", clientId: data.id });
   revalidatePath("/clientes");
   revalidatePath("/dashboard");
 }
@@ -63,6 +65,7 @@ export async function updateClientAction(id: string, formData: FormData) {
 
   const { error } = await supabase.from("clients").update(payload).eq("id", id);
   if (error) throw error;
+  await logActivity({ entityType: "client", entityId: id, entityName: payload.name, action: "updated", clientId: id });
   revalidatePath("/clientes");
   revalidatePath(`/clientes/${id}`);
   revalidatePath("/dashboard");

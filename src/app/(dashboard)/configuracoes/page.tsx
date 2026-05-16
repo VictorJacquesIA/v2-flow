@@ -80,17 +80,6 @@ export default async function ConfiguracoesPage() {
                 {process.env.ENCRYPTION_KEY ? "AES-256-GCM ativo" : "Configure ENCRYPTION_KEY"}
               </Badge>
             </div>
-            <Separator />
-            <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Key className="h-3.5 w-3.5 text-amber-400" />
-                <span className="text-xs font-medium text-amber-400">Importante</span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Configure a variável <code className="font-mono bg-muted px-1 rounded">ENCRYPTION_KEY</code> no seu ambiente antes de usar
-                o cofre de acessos em produção. Gere com: <code className="font-mono bg-muted px-1 rounded">openssl rand -hex 32</code>
-              </p>
-            </div>
           </CardContent>
         </Card>
       </div>

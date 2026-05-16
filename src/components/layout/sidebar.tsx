@@ -11,11 +11,12 @@ import {
   Wrench,
   Lightbulb,
   Settings,
-  Zap,
   LogOut,
   Menu,
   X,
+  Search,
 } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -78,15 +79,24 @@ export function Sidebar() {
   const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
     <div className="flex h-full flex-col">
       {/* Logo */}
-      <div className="flex h-14 items-center gap-2 border-b border-border px-4">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
-          <Zap className="h-4 w-4 text-primary-foreground" />
-        </div>
-        <span className="text-sm font-semibold tracking-tight">V2 Flow</span>
+      <div className="flex h-[120px] items-center justify-center border-b border-border px-4">
+        <Image src="/logo.png" alt="V2 Flow" width={160} height={160} className="rounded-2xl object-contain" style={{ maxHeight: 110 }} />
+      </div>
+
+      {/* Search */}
+      <div className="px-2 pt-3 pb-1">
+        <button
+          onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true }))}
+          className="flex w-full items-center gap-2 rounded-lg border border-border/50 bg-muted/30 px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+        >
+          <Search className="h-3.5 w-3.5 shrink-0" />
+          <span className="flex-1 text-left text-xs">Buscar...</span>
+          <kbd className="rounded bg-muted px-1 text-[10px]">Ctrl K</kbd>
+        </button>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
         {navItems.map((item) => (
           <NavItem
             key={item.href}

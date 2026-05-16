@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { logActivity } from "./activity";
 import type { ProjectStatus, ProjectPriority } from "@/types";
 
 export async function getProjects() {
@@ -41,8 +42,9 @@ export async function createProjectAction(formData: FormData) {
     description: formData.get("description") as string || null,
   };
 
-  const { error } = await supabase.from("projects").insert([payload]);
+  const { data, error } = await supabase.from("projects").insert([payload]).select("id").single();
   if (error) throw error;
+  await logActivity({ entityType: "project", entityId: data.id, entityName: payload.name, action: "created", projectId: data.id, clientId: payload.client_id || null });
   revalidatePath("/projetos");
   revalidatePath("/dashboard");
   if (payload.client_id) revalidatePath(`/clientes/${payload.client_id}`);
@@ -66,8 +68,11 @@ export async function updateProjectAction(id: string, formData: FormData) {
 
   const { error } = await supabase.from("projects").update(payload).eq("id", id);
   if (error) throw error;
+  await logActivity({ entityType: "project", entityId: id, entityName: payload.name, action: "updated", projectId: id, clientId: payload.client_id || null });
   revalidatePath("/projetos");
+  revalidatePath(`/projetos/${id}`);
   revalidatePath("/dashboard");
+  if (payload.client_id) revalidatePath(`/clientes/${payload.client_id}`);
 }
 
 export async function deleteProjectAction(id: string) {

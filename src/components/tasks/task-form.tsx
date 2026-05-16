@@ -25,8 +25,8 @@ export function TaskForm({ task, clientId, onSuccess }: TaskFormProps) {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(task?.status ?? "pendente");
   const [priority, setPriority] = useState(task?.priority ?? "media");
-  const [selectedClientId, setSelectedClientId] = useState(task?.client_id ?? clientId ?? "");
-  const [selectedProjectId, setSelectedProjectId] = useState(task?.project_id ?? "");
+  const [selectedClientId, setSelectedClientId] = useState(task?.client_id ?? clientId ?? "none");
+  const [selectedProjectId, setSelectedProjectId] = useState(task?.project_id ?? "none");
   const [clients, setClients] = useState<{ id: string; name: string }[]>([]);
   const [projects, setProjects] = useState<{ id: string; name: string }[]>([]);
 
@@ -38,7 +38,7 @@ export function TaskForm({ task, clientId, onSuccess }: TaskFormProps) {
   }, []);
 
   useEffect(() => {
-    if (!selectedClientId) { setProjects([]); return; }
+    if (!selectedClientId || selectedClientId === "none") { setProjects([]); return; }
     createClient().from("projects").select("id, name").eq("client_id", selectedClientId).order("name").then(({ data }) => {
       if (data) setProjects(data);
     });
@@ -51,8 +51,8 @@ export function TaskForm({ task, clientId, onSuccess }: TaskFormProps) {
       const formData = new FormData(e.currentTarget);
       formData.set("status", status);
       formData.set("priority", priority);
-      formData.set("client_id", selectedClientId);
-      formData.set("project_id", selectedProjectId);
+      formData.set("client_id", selectedClientId === "none" ? "" : selectedClientId);
+      formData.set("project_id", selectedProjectId === "none" ? "" : selectedProjectId);
 
       if (task) {
         await updateTaskAction(task.id, formData);
@@ -83,17 +83,17 @@ export function TaskForm({ task, clientId, onSuccess }: TaskFormProps) {
           <Select value={selectedClientId} onValueChange={setSelectedClientId}>
             <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Nenhum</SelectItem>
+              <SelectItem value="none">Nenhum</SelectItem>
               {clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-2">
           <Label>Projeto</Label>
-          <Select value={selectedProjectId} onValueChange={setSelectedProjectId} disabled={!selectedClientId}>
+          <Select value={selectedProjectId} onValueChange={setSelectedProjectId} disabled={!selectedClientId || selectedClientId === "none"}>
             <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Nenhum</SelectItem>
+              <SelectItem value="none">Nenhum</SelectItem>
               {projects.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
             </SelectContent>
           </Select>

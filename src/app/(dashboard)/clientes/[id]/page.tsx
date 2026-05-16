@@ -4,7 +4,9 @@ import { Header } from "@/components/layout/header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ActivityTimeline } from "@/components/common/activity-timeline";
+import { getClientActivity } from "@/app/actions/activity";
 import { ClientDialog } from "@/components/clients/client-dialog";
 import { ClientDeleteButton } from "@/components/clients/client-delete-button";
 import { ProjectDialog } from "@/components/projects/project-dialog";
@@ -15,7 +17,7 @@ import { ChargeDialog } from "@/components/charges/charge-dialog";
 import { RevealPasswordButton } from "@/components/accesses/reveal-password-button";
 import {
   Edit, Trash2, Plus, MessageCircle, Mail, Globe,
-  ExternalLink, Lock, Calendar, DollarSign
+  ExternalLink, Lock, Calendar, DollarSign, Clock,
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import Link from "next/link";
@@ -61,6 +63,7 @@ export default async function ClientPage({ params }: { params: { id: string } })
     { data: charges },
     { data: links },
     { data: accesses },
+    activityLogs,
   ] = await Promise.all([
     supabase.from("clients").select("*").eq("id", params.id).single(),
     supabase.from("projects").select("*").eq("client_id", params.id).order("created_at", { ascending: false }),
@@ -68,6 +71,7 @@ export default async function ClientPage({ params }: { params: { id: string } })
     supabase.from("charges").select("*, projects(name)").eq("client_id", params.id).order("due_date", { ascending: false }),
     supabase.from("links").select("*").eq("client_id", params.id).order("created_at", { ascending: false }),
     supabase.from("accesses").select("*").eq("client_id", params.id).order("created_at", { ascending: false }),
+    getClientActivity(params.id),
   ]);
 
   if (!client) notFound();
@@ -115,13 +119,14 @@ export default async function ClientPage({ params }: { params: { id: string } })
 
         {/* Tabs */}
         <Tabs defaultValue="visao-geral">
-          <TabsList className="w-full sm:w-auto">
+          <TabsList className="w-full sm:w-auto flex-wrap">
             <TabsTrigger value="visao-geral">Visão Geral</TabsTrigger>
             <TabsTrigger value="projetos">Projetos ({projects?.length ?? 0})</TabsTrigger>
             <TabsTrigger value="tarefas">Tarefas ({tasks?.length ?? 0})</TabsTrigger>
             <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
             <TabsTrigger value="links">Links</TabsTrigger>
             <TabsTrigger value="acessos">Acessos</TabsTrigger>
+            <TabsTrigger value="atividades">Atividades</TabsTrigger>
           </TabsList>
 
           {/* Visão Geral */}
@@ -301,6 +306,21 @@ export default async function ClientPage({ params }: { params: { id: string } })
                 </Card>
               ))
             )}
+          </TabsContent>
+
+          {/* Atividades */}
+          <TabsContent value="atividades" className="mt-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium">Histórico de Atividades</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ActivityTimeline logs={activityLogs} />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

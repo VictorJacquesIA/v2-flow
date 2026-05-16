@@ -25,9 +25,9 @@ export function ChargeDialog({ children, charge, clientId }: ChargeDialogProps) 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(charge?.status ?? "pendente");
-  const [paymentMethod, setPaymentMethod] = useState(charge?.payment_method ?? "");
+  const [paymentMethod, setPaymentMethod] = useState(charge?.payment_method ?? "none");
   const [selectedClientId, setSelectedClientId] = useState(charge?.client_id ?? clientId ?? "");
-  const [selectedProjectId, setSelectedProjectId] = useState(charge?.project_id ?? "");
+  const [selectedProjectId, setSelectedProjectId] = useState(charge?.project_id ?? "none");
   const [clients, setClients] = useState<{ id: string; name: string }[]>([]);
   const [projects, setProjects] = useState<{ id: string; name: string }[]>([]);
 
@@ -41,7 +41,7 @@ export function ChargeDialog({ children, charge, clientId }: ChargeDialogProps) 
   }, [open]);
 
   useEffect(() => {
-    if (!selectedClientId) { setProjects([]); return; }
+    if (!selectedClientId || selectedClientId === "none") { setProjects([]); return; }
     createClient().from("projects").select("id, name").eq("client_id", selectedClientId).order("name").then(({ data }) => {
       if (data) setProjects(data);
     });
@@ -53,9 +53,9 @@ export function ChargeDialog({ children, charge, clientId }: ChargeDialogProps) 
     try {
       const formData = new FormData(e.currentTarget);
       formData.set("status", status);
-      formData.set("payment_method", paymentMethod);
+      formData.set("payment_method", paymentMethod === "none" ? "" : paymentMethod);
       formData.set("client_id", selectedClientId);
-      formData.set("project_id", selectedProjectId);
+      formData.set("project_id", selectedProjectId === "none" ? "" : selectedProjectId);
 
       if (charge) {
         await updateChargeAction(charge.id, formData);
@@ -93,10 +93,10 @@ export function ChargeDialog({ children, charge, clientId }: ChargeDialogProps) 
 
           <div className="space-y-2">
             <Label>Projeto</Label>
-            <Select value={selectedProjectId} onValueChange={setSelectedProjectId} disabled={!selectedClientId}>
+            <Select value={selectedProjectId} onValueChange={setSelectedProjectId} disabled={!selectedClientId || selectedClientId === "none"}>
               <SelectTrigger><SelectValue placeholder="Opcional..." /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Nenhum</SelectItem>
+                <SelectItem value="none">Nenhum</SelectItem>
                 {projects.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -136,7 +136,7 @@ export function ChargeDialog({ children, charge, clientId }: ChargeDialogProps) 
               <Select value={paymentMethod} onValueChange={setPaymentMethod}>
                 <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">—</SelectItem>
+                  <SelectItem value="none">—</SelectItem>
                   <SelectItem value="pix">PIX</SelectItem>
                   <SelectItem value="boleto">Boleto</SelectItem>
                   <SelectItem value="cartao_credito">Cartão de Crédito</SelectItem>
