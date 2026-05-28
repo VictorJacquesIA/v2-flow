@@ -229,3 +229,21 @@ insert into services (name, description, base_price, type) values
   ('Tráfego Pago', 'Gestão de campanhas no Google Ads ou Meta Ads', 1200.00, 'recorrente'),
   ('Consultoria', 'Consultoria estratégica em marketing digital', 500.00, 'unico')
 on conflict do nothing;
+
+-- =====================
+-- EBOOK GENERATIONS
+-- =====================
+create table if not exists ebook_generations (
+  id uuid default uuid_generate_v4() primary key,
+  business_name text not null,
+  city text not null,
+  niche text not null,
+  keyword text not null,
+  file_name text not null,
+  created_at timestamptz default now() not null
+);
+
+alter table ebook_generations enable row level security;
+
+create policy "Authenticated users can manage ebook_generations"
+  on ebook_generations for all using (auth.role() = 'authenticated');

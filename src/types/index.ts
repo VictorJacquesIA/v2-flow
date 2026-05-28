@@ -189,3 +189,70 @@ export interface DashboardStats {
   pendingCharges: number;
   monthRevenue: number;
 }
+
+export interface EbookGeneration {
+  id: string;
+  business_name: string;
+  city: string;
+  niche: string;
+  keyword: string;
+  file_name: string;
+  created_at: string;
+}
+
+export interface EbookFormData {
+  businessName:   string;
+  niche:          string;
+  keyword:        string;
+  city:           string;
+  gbpPackageText: string; // texto completo do Pacote GBP (seções 3.1–3.9)
+}
+
+// ── Ebook GBP — Pipeline ─────────────────────────────────────────────────────
+
+export interface EbookScores {
+  presencaLocal: number;
+  autoridade:    number;
+  conversao:     number;
+  reputacao:     number;
+  conteudo:      number;
+}
+
+export interface DiagnosisAiOutput {
+  insightLines:        string[];
+  segmentPatterns:     string[];
+  clientsLostEstimate: number;
+}
+
+export interface ReviewTemplates {
+  positive: string[];
+  neutral:  string[];
+  negative: string[];
+}
+
+export interface GbpPost {
+  type:  "Atualização" | "Oferta" | "Novidade";
+  title: string;
+  body:  string;
+  cta:   string;
+}
+
+export interface GbpPackageParsed {
+  nameOptimized:        string;
+  categoryPrimary:      string;
+  categoriesAdditional: string[];
+  description:          string;
+  services:             Array<{ title: string; description: string }>;
+  faqQuestions:         string[];
+  faqAnswers:           string[];
+  reviewTemplates:      ReviewTemplates;
+  posts:                GbpPost[];
+  photoFiles:           string[];
+  checklistItems:       string[];
+}
+
+export interface EbookContent {
+  scores:    EbookScores;
+  diagnosis: DiagnosisAiOutput;
+  parsed:    GbpPackageParsed;
+}

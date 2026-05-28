@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v2-flow-v1';
+const CACHE_NAME = 'v2-flow-v2'; // versão incrementada para invalidar cache anterior
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -18,7 +18,7 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Não cacheia chamadas ao Supabase ou rotas de API
+  // Não cacheia chamadas ao Supabase, rotas de API ou HMR
   if (
     url.hostname.includes('supabase') ||
     url.pathname.startsWith('/api/') ||
@@ -30,8 +30,11 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       caches.match(event.request).then((cached) =>
         cached || fetch(event.request).then((res) => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          // Só cacheia se a resposta for bem-sucedida
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
           return res;
         })
       )
@@ -40,11 +43,14 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Páginas: network-first com fallback para cache
+  // IMPORTANTE: só cacheia respostas 2xx para não persistir erros
   event.respondWith(
     fetch(event.request)
       .then((res) => {
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        if (res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
         return res;
       })
       .catch(() => caches.match(event.request))

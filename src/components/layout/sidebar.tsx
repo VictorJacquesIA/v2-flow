@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   Search,
+  BookOpen,
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -31,6 +32,7 @@ const navItems = [
   { href: "/financeiro", label: "Financeiro", icon: DollarSign },
   { href: "/servicos", label: "Serviços", icon: Wrench },
   { href: "/ideias", label: "Ideias", icon: Lightbulb },
+  { href: "/ebooks", label: "Ebook GBP", icon: BookOpen },
   { href: "/configuracoes", label: "Configurações", icon: Settings },
 ];
 

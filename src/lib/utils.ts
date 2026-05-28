@@ -40,3 +40,36 @@ export function daysUntil(date: string | null | undefined): number | null {
   const diff = new Date(date + "T23:59:59").getTime() - new Date().getTime();
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
+
+/** Converte string para slug de arquivo: remove acentos, minúsculas, espaços → hífens */
+export function slugify(s: string): string {
+  return s
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+/** Gera nome de arquivo padronizado para ebook GBP */
+export function ebookFileName(businessName: string): string {
+  return `ebook-gbp-${slugify(businessName)}-${Date.now()}.pdf`;
+}
+
+/** Faz download de um Blob no browser com o nome especificado */
+export function downloadBlob(blob: Blob, fileName: string): void {
+  const url = URL.createObjectURL(blob);
+  try {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
