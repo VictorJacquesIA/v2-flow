@@ -58,9 +58,22 @@ export async function POST(req: NextRequest) {
     Promise.resolve(ebookFileName(businessName)),
   ]);
 
+  // Upload para Supabase Storage
+  let storage_url: string | null = null;
+  const { data: uploadData } = await supabase.storage
+    .from("ebooks")
+    .upload(fileName, new Uint8Array(buffer), {
+      contentType: "application/pdf",
+      upsert: true,
+    });
+  if (uploadData) {
+    const { data: urlData } = supabase.storage.from("ebooks").getPublicUrl(uploadData.path);
+    storage_url = urlData.publicUrl;
+  }
+
   await supabase
     .from("ebook_generations")
-    .insert([{ business_name: businessName, city, niche, keyword, file_name: fileName }]);
+    .insert([{ business_name: businessName, city, niche, keyword, file_name: fileName, storage_url }]);
 
   return new NextResponse(new Uint8Array(buffer), {
     status: 200,

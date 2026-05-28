@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EbookDialog } from "@/components/ebooks/ebook-dialog";
 import { EbookDeleteButton } from "@/components/ebooks/ebook-delete-button";
-import { BookOpen, Plus } from "lucide-react";
+import { BookOpen, Plus, Download } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 
 export default async function EbooksPage() {
@@ -93,6 +93,18 @@ export default async function EbooksPage() {
                   <span className="text-xs text-muted-foreground hidden sm:block">
                     {formatDateTime(ebook.created_at)}
                   </span>
+                  {ebook.storage_url && (
+                    <a
+                      href={ebook.storage_url}
+                      download={ebook.file_name}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded text-muted-foreground hover:text-foreground transition-colors"
+                      title="Baixar PDF"
+                    >
+                      <Download className="h-4 w-4" />
+                    </a>
+                  )}
                   <EbookDeleteButton id={ebook.id} />
                 </div>
               </div>

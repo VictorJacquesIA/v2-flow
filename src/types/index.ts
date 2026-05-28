@@ -197,6 +197,7 @@ export interface EbookGeneration {
   niche: string;
   keyword: string;
   file_name: string;
+  storage_url: string | null;
   created_at: string;
 }
 
