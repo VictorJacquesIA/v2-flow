@@ -1,23 +1,10 @@
 import React from "react";
-import fs from "fs";
-import path from "path";
 import {
   Document, Page, Text, View, StyleSheet, Image,
 } from "@react-pdf/renderer";
 import type { EbookContent } from "@/types";
 import { CONTACT_PHONE, CONTACT_SITE, CTA_HEADLINE, CTA_SUB, CTA_BUTTON } from "@/lib/ebook/ctas";
-
-function loadLogoBase64(): string {
-  try {
-    const logoPath = path.join(process.cwd(), "public", "vitrine-local.png");
-    const data = fs.readFileSync(logoPath);
-    return `data:image/png;base64,${data.toString("base64")}`;
-  } catch {
-    return "";
-  }
-}
-
-const VITRINE_LOGO = loadLogoBase64();
+import { VITRINE_LOGO_B64 as VITRINE_LOGO } from "@/lib/ebook/logo-b64";
 
 // ─── Paleta ──────────────────────────────────────────────────────────────────
 
